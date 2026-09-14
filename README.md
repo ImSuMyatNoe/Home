@@ -91,7 +91,6 @@ An arcade aisle running away from you under a slatted roof, stalls stacked to th
 
 ### 9. Then sit down and eat
 
-![The bowl arrives](docs/screenshots/11-the-bowl-arrives.png)
 
 The bowl comes down onto the table in front of you with its name above it, the steam still on it, the condiment caddy and the free glass of plain tea already there.
 
