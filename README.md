@@ -103,7 +103,11 @@ Then you actually eat it, and afterwards it tells you what it tastes of and one 
 
 ### 10. Finish whenever you like
 
-Go up the east stairway at Shwedagon whenever you have had enough of the day, light a candle, and say quietly what you came back for. Two hundred others light around yours while the sky goes over.
+![Shwedagon](docs/screenshots/14-shwedagon.png)
+
+Everybody goes up before they leave the country. Mothers bring their children the week before a flight and stand them in front of it so the child will have seen it properly once.
+
+Go up the east stairway whenever you have had enough of the day, light a candle, and say quietly what you came back for. Two hundred others light around yours while the sky goes over. Whatever you write there is what the last page answers to, so it is worth writing the true one.
 
 ---
 
