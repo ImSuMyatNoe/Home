@@ -162,6 +162,10 @@ body{margin:0;background:var(--night);color:#F3EBDA;font-family:var(--sans);over
 input[type=file]{font-family:var(--sans);font-size:11.5px;max-width:196px}
 
 #endScrim{background:rgba(10,8,14,.5);backdrop-filter:blur(2px)}
+/* one measure for the whole closing, so nothing reads as two stacked columns */
+#endScrim .panel{max-width:790px}
+#endPanel p{max-width:none}
+#endPanel .say{margin-bottom:16px}
 #endScrim .panel{background:rgba(16,14,20,.9);color:#EFE9DC;border:1px solid rgba(243,235,218,.16);
   box-shadow:0 30px 90px rgba(0,0,0,.7)}
 #endScrim h2{color:#F3EBDA}
@@ -1985,7 +1989,9 @@ function ending(ranOut){
   setTimeout(function(){var w=$('wishIn');if(w)w.focus();},120);
 }
 function ending2(ranOut){
-  var n=Object.keys(S.eaten).length,name=esc(S.me.name||'You');
+  var n=Object.keys(S.eaten).length;
+  var raw=(S.me.name||'').trim();
+  var name=esc(raw ? raw.charAt(0).toUpperCase()+raw.slice(1) : 'you');
   /* what they came back for shapes how the day answers them */
   /* what they came back for decides how the day speaks to them at the end */
   function readWish(w){
@@ -1994,7 +2000,7 @@ function ending2(ranOut){
     if(!t) return {note:null,close:'You did not say what you came back for, and nobody asked. The candle burns exactly the same as the two hundred beside it.'};
     if(has(['parent','mother','father','mum','mom','dad','ma ma','baba','ba ba','amay','apay','family','sister','brother','grandmother','grandma','grandfather','son','daughter','အမေ','အဖေ','မိဘ']))
       return {note:'People come up here for their parents more than for anything else. The woman who handed you the candle knew that before you said it.',
-        close:'You will call them when you land. You will say the flight was fine, and that you ate well, and you will not manage to say any of this. That is alright. They have been lighting one of these for you too, on the days you did not know about.'};
+        close:'You will call them when you land. You will say the flight was fine, and that you are eating properly, and you will not manage to say any of this. That is alright. They have been lighting one of these for you too, on the days you did not know about.'};
     if(has(['food','eat','tea','mohinga','laphet','noodle','rice','taste','smell','broth','hungry','breakfast','ဆိုင်','ထမင်း']))
       return {note:'You came a very long way for something you could hold in two hands. Nobody here would find that strange.',
         close:'People think a country keeps you with its language or its family or its weather. It keeps you with breakfast. Four and a half thousand kilometres, and it still worked on you.'};
@@ -2011,6 +2017,16 @@ function ending2(ranOut){
       close:'Nobody up here asks what anybody else has written. You leave the candle burning and you go down the stairs and that is the whole of it.'};
   }
   var W = readWish(S.wish), note = W.note, closeLine = W.close;
+  /* the middle paragraph has to describe the day that actually happened */
+  var didWork = Object.keys(S.jobsDone).length>0, didEat = Object.keys(S.eaten).length>0;
+  var wasAbout =
+    (didWork && didEat)
+      ? 'It was about a morning where nothing has to be explained to you. Ordering in two words without reaching for them. The man at the tea shop already knowing. Standing behind a counter for an hour, and then paying for your own breakfast like anybody else on that street.'
+    : (didWork && !didEat)
+      ? 'It was about a morning where nothing has to be explained to you. Somebody putting a kettle into your hands without first asking whether you knew what to do with it. Nobody checking on you. Nobody slowing down. You stood behind a counter on that street for an hour and it took you no time at all to remember how.'
+    : (!didWork && didEat)
+      ? 'It was about a morning where nothing has to be explained to you. Ordering in two words without reaching for them. The man at the tea shop already knowing. Eating standing up because there were no chairs, and nobody thinking to offer you one.'
+      : 'It was about a morning where nothing has to be explained to you. Walking a street where not one person looks at you twice. Knowing without checking which side of the road the shade is on. Understanding every word being shouted across you, and not one of them being meant for you.';
   var head = ranOut ? 'The light went while you were still walking' : 'Barefoot, on the warm marble';
   var open = ranOut
     ? 'Seven o’clock found you somewhere between one street and the next. The lamps come on along the stairway while you are still three roads away, and somehow it does not matter the way you thought it would.'
@@ -2043,7 +2059,7 @@ function ending2(ranOut){
       '<p class="dim" style="margin-top:6px">Your candle is in the fourth row. There are two hundred others.</p>':'')+
     /* the turn */
     '<p class="say" style="margin-top:20px">'+turn+'</p>'+
-    '<p class="say">It was about a morning where nothing has to be explained to you. Ordering in two words without reaching for them. The man at the tea shop already knowing. The woman at the stall straightening your longyi without asking first. Standing behind a counter for an hour and paying for your own breakfast, like anybody else on that street.</p>'+
+    '<p class="say">'+wasAbout+'</p>'+
     '<p class="say">Tomorrow the city carries on at half past eleven without you, the way it has every day for seven years. That always sounded like the sad part. It is the opposite. It is the only reason there is still somewhere to come back to.</p>'+
     '<p class="say">Nobody could tell you were a guest today, '+name+'.</p>'+
     '<p class="say">'+closeLine+'</p>'+
