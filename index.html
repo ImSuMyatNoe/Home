@@ -125,7 +125,7 @@ body{margin:0;background:var(--night);color:#F3EBDA;font-family:var(--sans);over
 .tag.sel{background:var(--jade);border-color:var(--jade);color:#fff}
 #nameIn{font-family:var(--sans);font-size:16px;font-weight:700;padding:10px 13px;border-radius:6px;width:100%;
   border:1px solid rgba(42,36,25,.25);background:#fff;color:var(--ink)}
-@media (max-width:640px){#dressWrap{grid-template-columns:1fr}#preview{min-height:220px}}
+@media (max-width:640px){#preview{min-height:240px}}
 
 .meter{position:relative;height:40px;background:#EDE4D2;border:1px solid rgba(42,36,25,.2);border-radius:4px;margin:12px 0 6px;overflow:hidden}
 .meter .band{position:absolute;top:0;bottom:0;background:rgba(46,122,102,.26);border-left:2px solid var(--jade);border-right:2px solid var(--jade)}
@@ -1987,28 +1987,44 @@ function ending(ranOut){
 function ending2(ranOut){
   var n=Object.keys(S.eaten).length,name=esc(S.me.name||'You');
   /* what they came back for shapes how the day answers them */
-  function wishNote(w){
+  /* what they came back for decides how the day speaks to them at the end */
+  function readWish(w){
     var t=(w||'').toLowerCase();
-    var has=function(list){for(var i=0;i<list.length;i++)if(t.indexOf(list[i])>=0)return true;return false;};
-    if(!t) return null;
-    if(has(['parent','mother','father','mum','mom','dad','ma ma','baba','ba ba','amay','apay','family','sister','brother','grandmother','grandma','grandfather','အမေ','အဖေ','မိဘ']))
-      return 'People come up here for their parents more than for anything else. The woman who handed you the candle knew that before you said it.';
+    var has=function(l){for(var i=0;i<l.length;i++)if(t.indexOf(l[i])>=0)return true;return false;};
+    if(!t) return {note:null,close:'You did not say what you came back for, and nobody asked. The candle burns exactly the same as the two hundred beside it.'};
+    if(has(['parent','mother','father','mum','mom','dad','ma ma','baba','ba ba','amay','apay','family','sister','brother','grandmother','grandma','grandfather','son','daughter','အမေ','အဖေ','မိဘ']))
+      return {note:'People come up here for their parents more than for anything else. The woman who handed you the candle knew that before you said it.',
+        close:'You will call them when you land. You will say the flight was fine, and that you ate well, and you will not manage to say any of this. That is alright. They have been lighting one of these for you too, on the days you did not know about.'};
     if(has(['food','eat','tea','mohinga','laphet','noodle','rice','taste','smell','broth','hungry','breakfast','ဆိုင်','ထမင်း']))
-      return 'You came a very long way for something you could hold in two hands. Nobody here would find that strange.';
+      return {note:'You came a very long way for something you could hold in two hands. Nobody here would find that strange.',
+        close:'People think a country keeps you with its language or its family or its weather. It keeps you with breakfast. Four and a half thousand kilometres, and it still worked on you.'};
     if(has(['friend','him','her','them','somebody','someone','love','husband','wife','သူငယ်ချင်း']))
-      return 'A name, then. That is what most of these candles are, once you get close enough to read them.';
+      return {note:'A name, then. That is what most of these candles are, once you get close enough to read them.',
+        close:'They are either still in the city or they are somewhere else now, doing exactly what you did. Either way the candle burns the same, and either way they would know your voice on the phone straight away.'};
     if(has(['street','city','house','home','road','yangon','rangoon','မြို့','အိမ်']))
-      return 'Not a person at all, but a street. That counts. Half of this platform is lit for places.';
-    return 'Whatever it was, it is on the platform now, in among two hundred others, and nobody is going to ask you to explain it.';
+      return {note:'Not a person at all, but a street. That counts. Half of this platform is lit for places.',
+        close:'A street can be a person, if you have walked it enough times. Nobody up here would argue with you about that.'};
+    if(has(['myself','me','who i','young','child','girl','before']))
+      return {note:'For yourself, then. That is the hardest one to say out loud, and the most common one up here.',
+        close:'The girl who left in September is still somewhere on this platform, barefoot, in a hurry, not yet knowing how long it would be. You came back for her as much as anything. She would be pleased with how today went.'};
+    return {note:'Whatever it was, it is on the platform now, in among two hundred others, and nobody is going to ask you to explain it.',
+      close:'Nobody up here asks what anybody else has written. You leave the candle burning and you go down the stairs and that is the whole of it.'};
   }
-  var note = wishNote(S.wish);
+  var W = readWish(S.wish), note = W.note, closeLine = W.close;
   var head = ranOut ? 'The light went while you were still walking' : 'Barefoot, on the warm marble';
   var open = ranOut
     ? 'Seven o’clock found you somewhere between one street and the next. The lamps come on along the stairway while you are still three roads away, and somehow it does not matter the way you thought it would.'
     : 'You leave your slippers at the bottom of the east stairway along with everybody else’s, and you go up. The stone is hot where the sun has been sitting on it and cool in the shade, in stripes, and your feet remember it before you do.';
-  var count = n===12 ? 'All twelve of them, and every one paid for out of an hour you stood and worked.'
-    : n===0 ? 'Not one, in the end. You spent the whole day earning and never once sat down, which, if you are honest, is the most Burmese thing you did all day.'
-    : n+' of the twelve, and you earned every kyat of it yourself. There is still '+money(S.kyat)+' folded into your longyi.';
+  var count = n===12
+    ? 'All twelve of them, and not one paid for with anybody else’s money. You are going to feel that on the plane and you are not going to mind.'
+    : n===0
+      ? (S.kyat>0
+          ? 'You worked all day and never once sat down to eat. There is '+money(S.kyat)+' kyat folded into your longyi and nothing at all on the card, which is its own kind of Burmese.'
+          : 'You did not earn anything and you did not eat anything. You simply walked around all day looking at it, which, after seven years, is not the worst way to spend the light.')
+      : n+' of the twelve, earned an hour at a time, with '+money(S.kyat)+' kyat still folded away. The other '+(12-n)+' will keep.';
+  var turn = n===0
+    ? 'You came back with a list of twelve things and did not sit down for a single one. It turns out the list was never really about the food either.'
+    : 'You came back for twelve things, and the list was never really about the food.';
   $('endPanel').innerHTML=
     '<p class="kick">19:00 · ရွှေတိဂုံဘုရား · the day is finished</p>'+
     '<h2>'+head+'</h2>'+
@@ -2018,15 +2034,19 @@ function ending2(ranOut){
       return '<div class="cardCell'+(had?'':' locked')+'" style="padding:7px">'+
         (had?dishArt(d.id,62):'<div class="ghost" style="height:56px">·</div>')+
         '<div class="nm" style="font-size:10.5px">'+d.en+'</div></div>';}).join('')+'</div>'+
-    '<p class="dim" style="margin-top:14px">'+count+'</p>'+
-    (S.wish?'<p class="say" style="margin-top:18px;color:#F0C97A;font-size:23px;line-height:1.5">“'+esc(S.wish)+'”</p>'+
-      (note?'<p class="dim" style="margin-top:-2px;max-width:52ch">'+note+'</p>':'')+
-      '<p class="dim" style="margin-top:6px">Your candle is in the fourth row, and there are two hundred others.</p>':'')+
-    '<p class="say" style="margin-top:18px">You came back for twelve things, and the list was never really about the food.</p>'+
-    '<p class="say">It was about a morning where nobody has to explain anything to you. Where you order in two words without thinking about them, and the man at the tea shop already knows, and the woman at the stall straightens your longyi without asking first. Where you work an hour, and eat standing up, and pay for it yourself.</p>'+
-    '<p class="say">Tomorrow the city will carry on at half past eleven without you, the way it has every day for seven years. It will keep doing that. I used to think that was the sad part. It is the opposite. It is the whole reason it is still there to come home to.</p>'+
-    '<p class="say">But today nobody could tell you were a guest, '+name+'. You were just somebody on the street, getting on with it.</p>'+
-    '<p class="say">Everybody comes up here before they leave the country. Mothers bring their children the week before a flight, and the children come back on their own years later and stand in the same spot, a little embarrassed, not quite knowing what to say. You were one of those children once. You are the one who came back now.</p>'+
+    /* the custom first, because it is the setting, not the payoff */
+    '<p class="say" style="margin-top:20px">Everybody comes up here before they leave the country. Mothers bring their children the week before a flight and stand them in front of the right corner. Years later the children come back on their own, grown, a little embarrassed, not quite knowing what to say. You were one of those children once. Today you were the one who came back.</p>'+
+    /* what the day actually amounted to */
+    '<p class="dim" style="margin-top:16px;max-width:56ch">'+count+'</p>'+
+    (S.wish?'<p class="say" style="margin-top:16px;color:#F0C97A;font-size:23px;line-height:1.5">“'+esc(S.wish)+'”</p>'+
+      (note?'<p class="dim" style="margin-top:-2px;max-width:54ch">'+note+'</p>':'')+
+      '<p class="dim" style="margin-top:6px">Your candle is in the fourth row. There are two hundred others.</p>':'')+
+    /* the turn */
+    '<p class="say" style="margin-top:20px">'+turn+'</p>'+
+    '<p class="say">It was about a morning where nothing has to be explained to you. Ordering in two words without reaching for them. The man at the tea shop already knowing. The woman at the stall straightening your longyi without asking first. Standing behind a counter for an hour and paying for your own breakfast, like anybody else on that street.</p>'+
+    '<p class="say">Tomorrow the city carries on at half past eleven without you, the way it has every day for seven years. That always sounded like the sad part. It is the opposite. It is the only reason there is still somewhere to come back to.</p>'+
+    '<p class="say">Nobody could tell you were a guest today, '+name+'.</p>'+
+    '<p class="say">'+closeLine+'</p>'+
     /* the closing block */
     '<div style="margin-top:30px;padding-top:24px;border-top:1px solid rgba(243,235,218,.16);text-align:center">'+
     '<p class="say" style="color:#F0C97A;font-size:clamp(20px,2.6vw,27px);line-height:1.55;margin:0 auto;max-width:34ch">'+
